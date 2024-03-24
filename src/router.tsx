@@ -1,5 +1,6 @@
 import {Suspense, lazy} from 'react';
 import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom';
+import Layout from './components/Layout';
 
 const AppRouter = () => {
     const Overview = lazy(() => import('./components/Overview'));
@@ -12,7 +13,14 @@ const AppRouter = () => {
                         path='/'
                         element={<Navigate replace to='/paintings' />}
                     />
-                    <Route element={<Overview />} path={'/paintings'} />
+                    <Route
+                        element={
+                            <Layout>
+                                <Overview />
+                            </Layout>
+                        }
+                        path={'/paintings'}
+                    />
                     <Route element={<DetailPage />} path={'/paintings/:id'} />
                 </Routes>
             </Suspense>

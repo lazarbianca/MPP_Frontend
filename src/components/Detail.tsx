@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import Painting from '../model/Painting';
 import PaintingsList from '../service/PaintingApi';
+import '../styles/TextFieldStyles.css';
 
 const Detail = () => {
     const params = useParams();
@@ -40,15 +41,11 @@ const Detail = () => {
                             <TextField
                                 disabled={true}
                                 label={p?.author || ''}
-                                sx={{
-                                    '& .MuiInputLabel-outlined': {
-                                        color: '#e0e0e0',
-                                    },
-                                }}
+                                className='textfield__label'
                             />
                         </Grid>
                         <Grid item xs={2}>
-                            <Typography variant='h6'>
+                            <Typography variant='h6' color={'whitesmoke'}>
                                 <i>Museum:</i>
                             </Typography>
                         </Grid>
@@ -56,11 +53,7 @@ const Detail = () => {
                             <TextField
                                 disabled={true}
                                 label={p?.museum || ''}
-                                sx={{
-                                    '& .MuiInputLabel-outlined': {
-                                        color: '#e0e0e0',
-                                    },
-                                }}
+                                className='textfield__label'
                             ></TextField>
                         </Grid>
                     </Grid>

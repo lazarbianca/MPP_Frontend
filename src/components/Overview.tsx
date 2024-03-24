@@ -1,7 +1,10 @@
 import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
     Card,
     CardActionArea,
+    CardActions,
     CardContent,
     CardMedia,
     Grid,
@@ -9,21 +12,11 @@ import {
     Typography,
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
-import PaintingsList from '../service/PaintingApi';
-
-// const p = {
-//     id: 1,
-//     title: 'Mona Lisa',
-//     author: 'Leonardo da Vinci',
-//     year: 1503,
-//     movement: ArtMovement.RENAISSANCE,
-//     imageUrl:
-//         'https://upload.wikimedia.org/wikipedia/commons/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg',
-//     museum: 'Louvre Museum',
-// };
-
+import usePaintingStore from '../stores/PaintingStore';
+import '../styles/CardStyles.css';
 function Overview() {
     const navigate = useNavigate();
+    const {paintings, deletePainting, handleOpen} = usePaintingStore();
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} alignItems={'center'}>
@@ -36,26 +29,34 @@ function Overview() {
             <Grid item xs={12}>
                 <Grid item xs={4} display={'flex'}>
                     {/** ADD ICON */}
-                    <IconButton aria-label='add'>
+                    <IconButton onClick={() => handleOpen()} aria-label='add'>
                         <AddIcon sx={{color: 'white'}} />
                     </IconButton>
                 </Grid>
             </Grid>
             {/** mapping the ITEMS */}
-            {PaintingsList.map((p) => (
+            {paintings.map((p) => (
                 <Grid key={p.id} item xs={12} md={3} display={'flex'}>
-                    <Card sx={{maxWidth: 345, width: 345}}>
+                    <Card
+                        sx={{maxWidth: 345, width: 345}}
+                        className='portCardCl'
+                    >
                         <CardActionArea
                             // onClick={() => console.log(`tapped!${p.id}`)}
                             onClick={() => navigate(`/paintings/${p.id}`)}
+                            className='portBodyCl'
                         >
                             <CardMedia
-                                sx={{height: 300}}
                                 image={p.imageUrl}
                                 title={p.title}
+                                sx={{
+                                    height: 300,
+                                    width: 345,
+                                    objectFit: 'cover',
+                                }}
                             />
 
-                            <CardContent sx={{height: 105}}>
+                            <CardContent sx={{height: 'auto'}}>
                                 <Typography
                                     gutterBottom
                                     variant='h5'
@@ -77,22 +78,30 @@ function Overview() {
                                 </Typography>
                             </CardContent>
                         </CardActionArea>
+                        {/* <CardActionArea className='portBodyCl'> */}
+                        <CardActions className='portButCl'>
+                            <IconButton
+                                size='small'
+                                // sx={{position: 'relative', margin: 0}}
+                            >
+                                <DeleteIcon
+                                    onClick={() => deletePainting(p.id)}
+                                    aria-label='delete'
+                                    sx={{color: '#212121'}}
+                                />
+                            </IconButton>
+                            <IconButton size='small'>
+                                <EditIcon
+                                    onClick={() => handleOpen(p)}
+                                    aria-label='edit'
+                                    sx={{color: '#212121'}}
+                                />
+                            </IconButton>
+                        </CardActions>
+                        {/* </CardActionArea> */}
                     </Card>
                 </Grid>
             ))}
-            {/* {PaintingsList.map((p) => (
-                <Grid key={p.id} item xs={4} md={3}>
-                    <Card sx={{maxWidth: 345}}>
-                        <Card>
-                            <CardMedia
-                                sx={{height: 140}}
-                                image={p.imageUrl}
-                                title={p.title}
-                            />
-                        </Card>
-                    </Card>
-                </Grid>
-            ))} */}
         </Grid>
     );
 }
