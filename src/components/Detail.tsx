@@ -2,17 +2,16 @@ import {Grid, TextField, Typography} from '@mui/material';
 import React, {useState} from 'react';
 import {useParams} from 'react-router-dom';
 import Painting from '../model/Painting';
-import PaintingsList from '../service/PaintingApi';
+import usePaintingStore from '../stores/PaintingStore';
 import '../styles/TextFieldStyles.css';
 
 const Detail = () => {
     const params = useParams();
     const [p, setPainting] = useState<Painting | undefined>(undefined);
+    const {paintings} = usePaintingStore();
     React.useEffect(() => {
         if (params.id)
-            setPainting(
-                PaintingsList.find((p) => p.id === parseInt(params.id!)),
-            );
+            setPainting(paintings.find((p) => p.id === parseInt(params.id!)));
     }, [params.id]);
 
     return (
@@ -42,7 +41,37 @@ const Detail = () => {
                                 disabled={true}
                                 label={p?.author || ''}
                                 className='textfield__label'
+                                multiline={true}
+                                sx={{width: 350}}
                             />
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Typography variant='h6' color={'whitesmoke'}>
+                                <i>Year:</i>
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={10}>
+                            <TextField
+                                disabled={true}
+                                value={p?.year || ''}
+                                className='textfield__label'
+                                multiline={true}
+                                sx={{width: 350}}
+                            ></TextField>
+                        </Grid>
+                        <Grid item xs={2}>
+                            <Typography variant='h6' color={'whitesmoke'}>
+                                <i>Movement:</i>
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={10}>
+                            <TextField
+                                disabled={true}
+                                value={p?.movement || ''}
+                                className='textfield__label'
+                                multiline={true}
+                                sx={{width: 350}}
+                            ></TextField>
                         </Grid>
                         <Grid item xs={2}>
                             <Typography variant='h6' color={'whitesmoke'}>
@@ -52,8 +81,11 @@ const Detail = () => {
                         <Grid item xs={10}>
                             <TextField
                                 disabled={true}
-                                label={p?.museum || ''}
+                                value={p?.museum || ''}
+                                //value='very very very very long text'
                                 className='textfield__label'
+                                multiline={true}
+                                sx={{width: 350}}
                             ></TextField>
                         </Grid>
                     </Grid>

@@ -12,11 +12,19 @@ import {
     Typography,
 } from '@mui/material';
 import {useNavigate} from 'react-router-dom';
+import Painting from '../model/Painting';
 import usePaintingStore from '../stores/PaintingStore';
 import '../styles/CardStyles.css';
+import ConfirmationDialog from './ModalPopup';
+//import AlertDialog from './DeleteAlertDialog';
 function Overview() {
     const navigate = useNavigate();
     const {paintings, deletePainting, handleOpen} = usePaintingStore();
+    const handleConfirmation = (p: Painting) => {
+        // Perform action upon confirmation
+        deletePainting(p.id);
+        console.log('Confirmed!');
+    };
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} alignItems={'center'}>
@@ -80,15 +88,21 @@ function Overview() {
                         </CardActionArea>
                         {/* <CardActionArea className='portBodyCl'> */}
                         <CardActions className='portButCl'>
-                            <IconButton
-                                size='small'
-                                // sx={{position: 'relative', margin: 0}}
-                            >
-                                <DeleteIcon
-                                    onClick={() => deletePainting(p.id)}
-                                    aria-label='delete'
-                                    sx={{color: '#212121'}}
-                                />
+                            <IconButton size='small'>
+                                <ConfirmationDialog
+                                    title='Confirmation'
+                                    description='Are you sure you want to proceed?'
+                                    response={() => handleConfirmation(p)}
+                                >
+                                    {(showDialog) => (
+                                        <DeleteIcon
+                                            //onClick={() => deletePainting(p.id)}
+                                            onClick={showDialog}
+                                            aria-label='delete'
+                                            sx={{color: '#212121'}}
+                                        />
+                                    )}
+                                </ConfirmationDialog>
                             </IconButton>
                             <IconButton size='small'>
                                 <EditIcon

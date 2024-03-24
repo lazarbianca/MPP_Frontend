@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import Painting from '../model/Painting';
 import PaintingsList from '../service/PaintingApi';
 
-interface useDogStoreProps {
+interface usePaintingStoreProps {
     opened: boolean;
     handleOpen: (p?: Painting) => void;
     handleClose: () => void;
@@ -13,7 +13,7 @@ interface useDogStoreProps {
     editPainting: (p: Painting) => void;
 }
 
-const usePaintingStore = create<useDogStoreProps>((set) => ({
+const usePaintingStore = create<usePaintingStoreProps>((set) => ({
     opened: false,
     selectedPainting: {} as Painting,
     handleOpen: (p?: Painting) => set({opened: true, selectedPainting: p}),
