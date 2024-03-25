@@ -4,7 +4,7 @@ test.beforeEach(async ({page}) => {
     await page.goto('http://localhost:3000/paintings');
 });
 test('has title', async ({page}) => {
-    await expect(page).toHaveTitle(/Paintings Hub/);
+    await expect(page).toHaveTitle(/Online Art Gallery/);
 });
 
 test('add works correctly', async ({page}) => {

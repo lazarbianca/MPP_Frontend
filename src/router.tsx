@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 const AppRouter = () => {
     const Overview = lazy(() => import('./components/Overview'));
     const DetailPage = lazy(() => import('./components/Detail'));
+    const Chart = lazy(() => import('./components/PieDiagram'));
     return (
         <BrowserRouter>
             <Suspense fallback={<></>}>
@@ -22,6 +23,7 @@ const AppRouter = () => {
                         path={'/paintings'}
                     />
                     <Route element={<DetailPage />} path={'/paintings/:id'} />
+                    <Route element={<Chart />} path='/paintings/statistics' />
                 </Routes>
             </Suspense>
         </BrowserRouter>

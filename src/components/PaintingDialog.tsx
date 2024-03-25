@@ -16,13 +16,19 @@ interface Inputs {
     title: string;
     author: string;
     year: number;
-    movement: string;
+    movement: ArtMovement;
     imageUrl: string;
     museum?: string;
 }
 const PaintingDialog = () => {
-    const {opened, handleClose, addPainting, selectedPainting, editPainting} =
-        usePaintingStore();
+    const {
+        opened,
+        handleClose,
+        addPainting,
+        selectedPainting,
+        editPainting,
+        filterPaintings,
+    } = usePaintingStore();
     const {register, handleSubmit, control, reset} = useForm<Inputs>({});
     useEffect(() => {
         reset(selectedPainting);
@@ -33,11 +39,13 @@ const PaintingDialog = () => {
                 ...selectedPainting,
                 ...data,
             });
+            filterPaintings('');
         } else {
             addPainting({
                 id: Math.floor(Math.random() * 1000),
                 ...data,
             });
+            filterPaintings('');
         }
         reset();
         handleClose();

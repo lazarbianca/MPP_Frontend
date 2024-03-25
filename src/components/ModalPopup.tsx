@@ -13,6 +13,7 @@ import {
     ReactPortal,
     useState,
 } from 'react';
+import usePaintingStore from '../stores/PaintingStore';
 function ConfirmationDialog(props: {
     response: () => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -38,6 +39,7 @@ function ConfirmationDialog(props: {
         | null
         | undefined;
 }) {
+    const {filterPaintings} = usePaintingStore();
     //local states
     const [open, setOpen] = useState(false);
 
@@ -52,6 +54,7 @@ function ConfirmationDialog(props: {
     const confirmRequest = () => {
         props.response();
         hideDialog();
+        filterPaintings('');
     };
 
     return (
