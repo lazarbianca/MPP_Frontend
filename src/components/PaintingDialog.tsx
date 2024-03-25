@@ -118,7 +118,11 @@ const PaintingDialog = () => {
                         <Button variant='contained' type='submit' sx={{mr: 2}}>
                             Submit
                         </Button>
-                        <Button variant='outlined' onClick={handleClose}>
+                        <Button
+                            variant='outlined'
+                            aria-label='close'
+                            onClick={handleClose}
+                        >
                             Close
                         </Button>
                     </Grid>

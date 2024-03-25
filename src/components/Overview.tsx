@@ -53,6 +53,7 @@ function Overview() {
                             // onClick={() => console.log(`tapped!${p.id}`)}
                             onClick={() => navigate(`/paintings/${p.id}`)}
                             className='portBodyCl'
+                            aria-label={`card-action-area-${p.id}`}
                         >
                             <CardMedia
                                 image={p.imageUrl}
@@ -88,7 +89,10 @@ function Overview() {
                         </CardActionArea>
                         {/* <CardActionArea className='portBodyCl'> */}
                         <CardActions className='portButCl'>
-                            <IconButton size='small'>
+                            <IconButton
+                                size='small'
+                                aria-label={`delete-${p.id}`}
+                            >
                                 <ConfirmationDialog
                                     title='Confirmation'
                                     description='Are you sure you want to proceed?'
@@ -98,13 +102,15 @@ function Overview() {
                                         <DeleteIcon
                                             //onClick={() => deletePainting(p.id)}
                                             onClick={showDialog}
-                                            aria-label='delete'
                                             sx={{color: '#212121'}}
                                         />
                                     )}
                                 </ConfirmationDialog>
                             </IconButton>
-                            <IconButton size='small'>
+                            <IconButton
+                                size='small'
+                                aria-label={`edit-${p.id}`}
+                            >
                                 <EditIcon
                                     onClick={() => handleOpen(p)}
                                     aria-label='edit'

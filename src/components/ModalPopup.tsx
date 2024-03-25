@@ -73,10 +73,18 @@ function ConfirmationDialog(props: {
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={confirmRequest} color='primary'>
+                        <Button
+                            aria-label='yes'
+                            onClick={confirmRequest}
+                            color='primary'
+                        >
                             Yes
                         </Button>
-                        <Button onClick={hideDialog} color='primary'>
+                        <Button
+                            aria-label='no'
+                            onClick={hideDialog}
+                            color='primary'
+                        >
                             No
                         </Button>
                     </DialogActions>
