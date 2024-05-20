@@ -6,7 +6,8 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import {useEffect} from 'react';
+import axios from 'axios';
+import {useEffect, useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {ArtMovement} from '../model/Painting';
 import usePaintingStore from '../stores/PaintingStore';
@@ -14,7 +15,8 @@ import ReactHookFormSelect from './ReactHookFormSelect';
 interface Inputs {
     // Painting but without ID
     title: string;
-    author: string;
+    artistId: number;
+    artistName: string;
     year: number;
     movement: ArtMovement;
     imageUrl: string;
@@ -26,29 +28,46 @@ const PaintingDialog = () => {
         handleClose,
         addPainting,
         selectedPainting,
-        editPainting,
-        filterPaintings,
+        //editPainting,
+        // filterPaintings,
     } = usePaintingStore();
     const {register, handleSubmit, control, reset} = useForm<Inputs>({});
     useEffect(() => {
         reset(selectedPainting);
     }, [selectedPainting]);
-    const onSubmit: SubmitHandler<Inputs> = (data) => {
-        if (selectedPainting) {
-            editPainting({
-                ...selectedPainting,
-                ...data,
-            });
-            filterPaintings('');
-        } else {
-            addPainting({
-                id: Math.floor(Math.random() * 1000),
-                ...data,
-            });
-            filterPaintings('');
+
+    const {artists, fetchArtists} = usePaintingStore();
+
+    useEffect(() => {
+        console.log('artists');
+        fetchArtists();
+    }, []);
+    const {fetchPaintings} = usePaintingStore();
+    const [selectedArtist, setSelectedArtist] = useState<string>('');
+    const onSubmit: SubmitHandler<Inputs> = async (data) => {
+        try {
+            if (selectedPainting) {
+                // If selectedPainting exists, update the painting
+                await axios.put(
+                    `http://localhost:5000/updatePainting/${selectedPainting.id}`,
+                    data,
+                );
+            } else {
+                // If selectedPainting does not exist, add a new painting
+                const res = await axios.post(
+                    'http://localhost:5000/addPainting',
+                    data,
+                );
+                console.log(res.data);
+                addPainting(res.data);
+            }
+
+            // Reset the form after successfully adding/editing the painting
+            // reset();
+            fetchPaintings();
+        } catch (error) {
+            console.error('Error adding/editing painting:', error);
         }
-        reset();
-        handleClose();
     };
     return (
         <Dialog
@@ -72,10 +91,23 @@ const PaintingDialog = () => {
                     </Grid>
                     <Grid item xs={12}>
                         <TextField
-                            label='Author'
+                            select
+                            label='Artist'
                             fullWidth
-                            {...register('author', {required: true})}
-                        />
+                            {...register('artistId', {required: true})}
+                            value={selectedArtist}
+                            onChange={(e) => setSelectedArtist(e.target.value)}
+                            required
+                        >
+                            {artists.map((artist) => (
+                                <MenuItem
+                                    key={artist.artistId}
+                                    value={artist.artistId}
+                                >
+                                    {artist.name}
+                                </MenuItem>
+                            ))}
+                        </TextField>
                     </Grid>
                     <Grid item xs={12}>
                         <TextField

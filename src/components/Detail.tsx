@@ -8,10 +8,16 @@ import '../styles/TextFieldStyles.css';
 const Detail = () => {
     const params = useParams();
     const [p, setPainting] = useState<Painting | undefined>(undefined);
-    const {paintings} = usePaintingStore();
+    const {filteredPaintings} = usePaintingStore();
     React.useEffect(() => {
-        if (params.id)
-            setPainting(paintings.find((p) => p.id === parseInt(params.id!)));
+        if (params.id) {
+            console.log('Painting: ', p);
+            setPainting(
+                filteredPaintings.find(
+                    (p) => p.paintingId === parseInt(params.id!),
+                ),
+            );
+        }
     }, [params.id]);
 
     return (
@@ -39,7 +45,7 @@ const Detail = () => {
                         <Grid item xs={10}>
                             <TextField
                                 disabled={true}
-                                label={p?.author || ''}
+                                label={p?.Artist.name || ''}
                                 className='textfield__label'
                                 multiline={true}
                                 sx={{width: 350}}

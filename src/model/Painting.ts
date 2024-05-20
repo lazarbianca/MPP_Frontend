@@ -1,7 +1,10 @@
 export default interface Painting {
-    id: number;
+    paintingId: number;
     title: string;
-    author: string;
+    Artist: {
+        id?: number;
+        name?: string;
+    };
     year: number;
     movement: ArtMovement;
     imageUrl: string;
