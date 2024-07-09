@@ -22,22 +22,44 @@ import Painting from '../model/Painting';
 import usePaintingStore from '../stores/PaintingStore';
 import '../styles/CardStyles.css';
 import ConfirmationDialog from './ModalPopup';
+import useFetchPaintings from './ReactHookFetchPaintings';
 
 function Overview() {
     const navigate = useNavigate();
-    const {deletePainting, handleOpen, filterPaintings, paintings} =
+    const {artists, setArtists} = usePaintingStore();
+    const [value, setValue] = useState('');
+    const {fetchPaintings, deletePainting, fetchArtists, deleteArtist} =
+        useFetchPaintings();
+    const {handleOpen, filterPaintings, paintings, handleOpenArtist} =
         usePaintingStore();
-    const {handleOpenArtist} = usePaintingStore();
+    useEffect(() => {
+        console.log(`Set textfield to ${value}`);
+        setValue('');
+    }, [paintings]);
+    const actualFetchAndRefresh = async () => {
+        const getPaintings = async () => {
+            const filteredPaintings = await fetchPaintings();
+            setFilteredPaintings(filteredPaintings);
+        };
+        getPaintings();
+    };
+    const actualFetchAndRefreshArtists = async () => {
+        const getArtists = async () => {
+            const artists = await fetchArtists();
+            setArtists(artists);
+        };
+        getArtists();
+    };
     const handleConfirmation = (p: Painting) => {
         console.log(`Painting id: ${p.paintingId}`);
         // Perform action upon confirmation
         deletePainting(p.paintingId).then(() => {
-            fetchPaintings();
+            console.log('re-fetching after delete!');
+            actualFetchAndRefresh();
         });
         console.log('Confirmed!');
     };
     //const {register} = useForm<ArtMovement>({});
-    const [value, setValue] = useState('');
     const handleTextfieldChange = (e: {
         target: {value: SetStateAction<string>};
     }) => {
@@ -48,30 +70,34 @@ function Overview() {
     const handleFilter = (m: string) => {
         filterPaintings(m);
     };
-    useEffect(() => {
-        console.log(`Set textfield to ${value}`);
-        setValue('');
-    }, [paintings]);
 
     // DATA RETRIEVAL //////////////////////////////////////////////////////
-    const {filteredPaintings, fetchPaintings} = usePaintingStore();
-    const {artists, fetchArtists} = usePaintingStore();
+    const setFilteredPaintings = usePaintingStore(
+        (state) => state.setFilteredPaintings,
+    );
+    const filteredPaintings = usePaintingStore(
+        (state) => state.filteredPaintings,
+    );
+
+    // useEffect(() => {
+    //     console.log('Fetch paintings - OVERVIEW');
+    //     filteredPaintings = fetchPaintings();
+    // }, []);
 
     useEffect(() => {
-        console.log('*');
-        fetchPaintings();
+        actualFetchAndRefresh();
     }, []);
 
     useEffect(() => {
-        console.log('*');
-        fetchArtists();
+        console.log('Fetch artists - OVERVIEW');
+        actualFetchAndRefreshArtists();
     }, []);
     ////////////////////////////////////////////////////////////////////////
-    const {deleteArtist} = usePaintingStore();
     const handleConfirmationArtists = (a: Artist) => {
         // Perform action upon confirmation
         deleteArtist(a.artistId).then(() => {
-            fetchArtists();
+            console.log('Fetch artists - DELETE ARTIST');
+            actualFetchAndRefreshArtists();
         });
         console.log('Confirmed!');
     };
@@ -88,15 +114,6 @@ function Overview() {
     );
 
     const displayedPaintings = filteredPaintings.slice(startIndex, endIndex);
-
-    function getArtistNameFromId(artistId) {
-        // Find the artist object with the given ID
-        const artist = artists.find((artist) => artist.artistId === artistId);
-
-        // Return the name of the artist if found, otherwise return null
-        return artist ? artist.name : null;
-    }
-
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} alignItems={'center'}>
@@ -182,7 +199,9 @@ function Overview() {
                                     variant='body2'
                                     color='text.secondary'
                                 >
-                                    {getArtistNameFromId(p.Artist.id)}
+                                    {p.Artist
+                                        ? p.Artist.name
+                                        : 'Unknown Artist'}
                                 </Typography>
                             </CardContent>
                         </CardActionArea>
@@ -298,7 +317,7 @@ function Overview() {
                                 aria-label={`edit-${a.artistId}`}
                             >
                                 <EditIcon
-                                    //onClick={() => handleOpen(a)}
+                                    onClick={() => handleOpenArtist(a)}
                                     aria-label='edit'
                                     sx={{color: '#212121'}}
                                 />

@@ -7,10 +7,12 @@ import {
     Typography,
 } from '@mui/material';
 import axios from 'axios';
-import {useEffect, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
 import {ArtMovement} from '../model/Painting';
+import AuthContext from '../stores/AuthContext';
 import usePaintingStore from '../stores/PaintingStore';
+import useFetchPaintings from './ReactHookFetchPaintings';
 import ReactHookFormSelect from './ReactHookFormSelect';
 interface Inputs {
     // Painting but without ID
@@ -36,35 +38,66 @@ const PaintingDialog = () => {
         reset(selectedPainting);
     }, [selectedPainting]);
 
-    const {artists, fetchArtists} = usePaintingStore();
-
+    const {artists, setArtists} = usePaintingStore();
+    const {fetchArtists} = useFetchPaintings();
+    const actualFetchAndRefreshArtists = async () => {
+        const getArtists = async () => {
+            const artists = await fetchArtists();
+            setArtists(artists);
+        };
+        getArtists();
+    };
     useEffect(() => {
-        console.log('artists');
-        fetchArtists();
+        console.log('Fetch artists - PAINTING DIALOG');
+        actualFetchAndRefreshArtists();
     }, []);
-    const {fetchPaintings} = usePaintingStore();
+    const {fetchPaintings} = useFetchPaintings();
+    const setFilteredPaintings = usePaintingStore(
+        (state) => state.setFilteredPaintings,
+    );
     const [selectedArtist, setSelectedArtist] = useState<string>('');
+    const authContext = useContext(AuthContext);
+    const actualFetchAndRefresh = async () => {
+        const getPaintings = async () => {
+            const filteredPaintings = await fetchPaintings();
+            setFilteredPaintings(filteredPaintings);
+        };
+        getPaintings();
+    };
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
             if (selectedPainting) {
                 // If selectedPainting exists, update the painting
                 await axios.put(
-                    `http://localhost:5000/updatePainting/${selectedPainting.id}`,
+                    `https://mpp-backend-l6xq.onrender.com/updatePainting/${selectedPainting.paintingId}`,
                     data,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${authContext?.auth.token}`,
+                        },
+                    },
                 );
+                console.log('axios put painting');
             } else {
                 // If selectedPainting does not exist, add a new painting
                 const res = await axios.post(
-                    'http://localhost:5000/addPainting',
+                    'https://mpp-backend-l6xq.onrender.com/addPainting',
                     data,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${authContext?.auth.token}`,
+                        },
+                    },
                 );
-                console.log(res.data);
+                console.log('axios post painting', res.data);
                 addPainting(res.data);
             }
 
             // Reset the form after successfully adding/editing the painting
             // reset();
-            fetchPaintings();
+            actualFetchAndRefresh();
         } catch (error) {
             console.error('Error adding/editing painting:', error);
         }

@@ -1,8 +1,10 @@
 import {Button, Dialog, Grid, TextField, Typography} from '@mui/material';
 import axios from 'axios';
-import {useEffect} from 'react';
+import {useContext, useEffect} from 'react';
 import {SubmitHandler, useForm} from 'react-hook-form';
+import AuthContext from '../stores/AuthContext';
 import usePaintingStore from '../stores/PaintingStore';
+import useFetchPaintings from './ReactHookFetchPaintings';
 
 interface Inputs {
     name: string;
@@ -16,33 +18,60 @@ const ArtistDialog = () => {
         handleClosedArtist,
         selectedArtist,
         addArtist,
-        fetchArtists,
+        setArtists,
     } = usePaintingStore();
     const {register, handleSubmit, reset} = useForm<Inputs>({});
     useEffect(() => {
+        console.log('Dialog open state:', openedArtist);
+        console.log('Selected Artist:', selectedArtist);
         reset(selectedArtist);
-    }, [selectedArtist]);
+    }, [selectedArtist, openedArtist, reset]);
+
+    const {fetchArtists} = useFetchPaintings();
+    const actualFetchAndRefreshArtists = async () => {
+        const getArtists = async () => {
+            const artists = await fetchArtists();
+            setArtists(artists);
+        };
+        getArtists();
+    };
+    const authContext = useContext(AuthContext);
+
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
+            console.log('Submitting');
             if (selectedArtist) {
                 // If selectedArtist exists, update the artist
                 await axios.put(
-                    `http://localhost:5000/updateArtist/${selectedArtist.id}`,
+                    `https://mpp-backend-l6xq.onrender.com/updateArtist/${selectedArtist.artistId}`,
                     data,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${authContext?.auth.token}`,
+                        },
+                    },
                 );
             } else {
                 // If selectedPainting does not exist, add a new painting
                 const res = await axios.post(
-                    'http://localhost:5000/addArtist',
+                    'https://mpp-backend-l6xq.onrender.com/addArtist',
                     data,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${authContext?.auth.token}`,
+                        },
+                    },
                 );
-                console.log(res.data);
+                console.log('ARTIST DIALOG', res.data);
                 addArtist(res.data);
             }
 
             // Reset the form after successfully adding/editing the painting
             // reset();
-            fetchArtists();
+            console.log('Fetch artists - ARTIST DIALOG');
+            actualFetchAndRefreshArtists();
         } catch (error) {
             console.error('Error adding/editing artist:', error);
         }

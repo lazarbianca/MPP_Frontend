@@ -1,3 +1,4 @@
+import ArtistDialog from './ArtistDialog';
 import PaintingDialog from './PaintingDialog';
 
 interface LayoutProps {
@@ -7,6 +8,7 @@ const Layout = ({children}: LayoutProps) => {
     return (
         <>
             <PaintingDialog />
+            <ArtistDialog />
             {children}
         </>
     );
